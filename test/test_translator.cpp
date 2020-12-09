@@ -1,5 +1,5 @@
 #pragma once
-#include "utstackx.h"
+#include <translator.h>
 
 #include "gtest.h""
 TEST(TStack, can_create_stack_with_positive_size) {
@@ -149,3 +149,172 @@ TEST(TQueue, throws_when_create_queue_with_negative_length)
 {
 	ASSERT_ANY_THROW(TQueue<int> q(-1));
 }
+
+TEST(Translator, do_not_throw_when_try_transform_infix_in_postfix)
+{
+	Translator a;
+	a.setInfix("3+2");
+	ASSERT_NO_THROW(a.GoToPostfix());
+}
+
+TEST(Translator, can_add_elements)
+{
+	Translator a;
+	a.setInfix("2+3+4");
+	a.GoToPostfix();
+	EXPECT_EQ(9, a.GoToCalculate());
+}
+TEST(Translator, can_sub_elem_of_elem)
+{
+	Translator a;
+	a.setInfix("2-3");
+	a.GoToPostfix();
+	EXPECT_EQ(-1, a.GoToCalculate());
+}
+
+TEST(Translator, can_mult_elem_no_elem)
+{
+	Translator a;
+	a.setInfix("2*3*4");
+	a.GoToPostfix();
+	EXPECT_EQ(24, a.GoToCalculate());
+}
+TEST(Translator, can_div_elem_on_elem)
+{
+	Translator a;
+	a.setInfix("15/4");
+	a.GoToPostfix();
+	EXPECT_EQ(3.75, a.GoToCalculate());
+}
+
+TEST(Translator, can_use_brackets)
+{
+	Translator a;
+	a.setInfix("(2+3)*2");
+	a.GoToPostfix();
+	EXPECT_EQ(10, a.GoToCalculate());
+}
+
+TEST(Translator, can_add_int_to_double)
+{
+	Translator a;
+	a.setInfix("2.2+2");
+	a.GoToPostfix();
+	EXPECT_EQ(4.2, a.GoToCalculate());
+}
+
+TEST(Translator, can_add_double_to_double)
+{
+	Translator a;
+	a.setInfix("2.2+2.4");
+	a.GoToPostfix();
+	EXPECT_EQ(4.6, a.GoToCalculate());
+}
+
+TEST(Translator, can_mult_int_with_double)
+{
+	Translator a;
+	a.setInfix("2.1*5");
+	a.GoToPostfix();
+	EXPECT_EQ(10.5, a.GoToCalculate());
+}
+TEST(Translator, can_mult_double_with_double)
+{
+	Translator a;
+	a.setInfix("2.2*2.94");
+	a.GoToPostfix();
+	EXPECT_EQ(6.468, a.GoToCalculate());
+}
+TEST(Translator, cant_introduce_wrong_string_exp_1)
+{
+	Translator a;
+	a.setInfix("2.2+-2");
+	EXPECT_EQ(false, a.GoToPostfix());
+}
+TEST(Translator, cant_introduce_wrong_string_exp_2)
+{
+	Translator a;
+	a.setInfix("2.2-/2--2");
+	EXPECT_EQ(false, a.GoToPostfix());
+}
+TEST(Translator, cant_introduce_wrong_string_exp_3)
+{
+	Translator a;
+	a.setInfix("(2.2-2-))2");
+	EXPECT_EQ(false, a.GoToPostfix());
+}
+
+TEST(Translator, cant_introduce_wrong_string_exp_4)
+{
+	Translator a;
+	a.setInfix("2..2+2");
+	//std::cout << a.getInfix() << std::endl;
+	EXPECT_EQ(false, a.GoToPostfix());
+}
+
+TEST(Translator, cant_introduce_wrong_string_exp_5)
+{
+	Translator a;
+	a.setInfix("2.2.+2");
+	//std::cout << a.getInfix() << std::endl;
+	EXPECT_EQ(false, a.GoToPostfix());
+}
+
+TEST(Translator, cant_introduce_wrong_string_exp_6)
+{
+	Translator a;
+	a.setInfix(".2.2+2");
+	//std::cout << a.getInfix() << std::endl;
+	EXPECT_EQ(false, a.GoToPostfix());
+}
+
+TEST(Translator, cant_introduce_wrong_string_exp_7)
+{
+	Translator a;
+	a.setInfix("2..+12");
+	//std::cout << a.getInfix() << std::endl;
+	EXPECT_EQ(false, a.GoToPostfix());
+}
+
+TEST(Translator, cant_introduce_wrong_string_exp_8)
+{
+	Translator a;
+	a.setInfix("+-*/");
+	//std::cout << a.getInfix() << std::endl;
+	EXPECT_EQ(false, a.GoToPostfix());
+}
+
+TEST(Translator, cant_introduce_wrong_string_exp_9)
+{
+	Translator a;
+	a.setInfix(".2-0.1");
+	//std::cout << a.getInfix() << std::endl;
+	EXPECT_EQ(false, a.GoToPostfix());
+}
+
+TEST(Translator, cant_introduce_wrong_string_exp_10)
+{
+	Translator a;
+	a.setInfix("4.2+1.*");
+	//std::cout << a.getInfix() << std::endl;
+	EXPECT_EQ(false, a.GoToPostfix());
+}
+
+TEST(Translator, can_introduce_well_string)
+{
+	Translator a;
+	a.setInfix("2.2+2-2+1");
+	EXPECT_EQ(true, a.GoToPostfix());
+}
+
+TEST(Translator, can_calculate_dificult_example)
+{
+	Translator a;
+	a.setInfix("2.2*2.94+1*(7/8)");
+	std::cout << a.getInfix() << std::endl;
+	a.GoToPostfix();
+	std::cout<< a.getPostfix() << std::endl;
+	std::cout << a.GoToCalculate() << std::endl;
+	EXPECT_EQ(7.343, a.GoToCalculate());
+}
+
