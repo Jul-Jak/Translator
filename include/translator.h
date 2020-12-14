@@ -197,6 +197,7 @@ private:
 			return 2;
 		}
 	}
+	bool checkBrakets();
 	bool checkInfix();
 	bool isZnak(int);	
 public:
@@ -207,28 +208,72 @@ public:
 	double GoToCalculate();
 };
 
-bool Translator::checkInfix() {
+bool Translator::checkBrakets() {
 	int bracket = 0;
-	bool point = true;
-	for (int i = 0; i < infix.size(); i++)
-	{
+	for (int i = 0; i < infix.size(); i++) {
 		if (infix[i] == '(') bracket++;
 		else if (infix[i] == ')') bracket--;
-		else if (bracket < 0) return false;
-		else if (i && isZnak(i) && isZnak(i - 1)) return false;
 	}
-	if (bracket) return false;
-	if ((infix[0] == '.') || (infix[infix.size() - 1] == '.')) point = false;
-	if ((isZnak(0)) || (isZnak(infix.size() - 1))) point = false;
-	for (int i = 1; i < infix.size() - 2; i++)
+	if (bracket < 0) return false;
+	else return true;
+}
+
+bool Translator::checkInfix() {
+	int status = 0;
+	int braket = 0;
+	int point = 0;
+	for (int i = 0; i < infix.size(); i++) 
 	{
-		if (infix[i] == '.') 
-		{
-			if (infix[i-1] < '0' || infix[i-1] > '9') point = false;
-			if (infix[i+1] < '0' || infix[i+1] > '9') point = false;
+		switch (status) {  // status - переменная состояния
+		case 0:
+			if (infix[i] == '\0') status = 2;
+			if (infix[0] == '-')status = 3;
+			if (infix[i] == '(') 
+			{
+				braket++;
+				status = 0;
+			}
+			if ((infix[i] < '0' || infix[i] > '9') && infix[i] != '(' && infix[i] != '\0') status = 3;
+			if (infix[i] >= '0' && infix[i] <= '9' || (infix[i + 1] == '.'))
+			{
+				{
+					status = 1;
+					int dt = 0;
+					while (((infix[i + 1] >= '0') && (infix[i + 1] <= '9')) || (infix[i + 1] == '.'))
+					{
+						i++;
+						if (infix[i] == '.')
+						{
+							dt++;
+							if (infix[i + 1] == '.') dt++;
+						}
+					}
+					if ((dt > 1) || (infix[i] == '.')) status = 3;
+				}
+			}
+			break;
+		case 1:
+			if (infix[i] == '\0') status = 2;
+			if (infix[i] == ')') {
+				braket--;
+				if (braket >= 0) status = 1;
+				if (braket < 0) status = 3;
+			}
+			if (isZnak(i)) status = 0;
+			if ((!isZnak(i)) && infix[i] != ')' && infix[i] != '\0') status = 3;
+			break;
+		case 2:
+			if (braket == 0) status = 4;
+			if (braket != 0) status = 3;
+			break;
+		case 3:
+			return false;
+			break;
+		case 4:
+			return true;
+			break;
 		}
 	}
-	return point;
 }
 
 bool Translator::isZnak(int i) {
@@ -296,7 +341,13 @@ double Translator::GoToCalculate() {
 				Result = std.pop() * std.pop();
 				break;
 			case '/':
-				Result = (1 / std.pop()) * std.pop();
+				double znam;
+				znam = std.pop();
+				if (znam == 0.0) {
+					std::cout << "ERROR!" << std::endl;
+					Result = -404;
+				}
+				else Result = (1 / znam) * std.pop(); 
 				break;
 			}
 

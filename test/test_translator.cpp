@@ -182,9 +182,9 @@ TEST(Translator, can_mult_elem_no_elem)
 TEST(Translator, can_div_elem_on_elem)
 {
 	Translator a;
-	a.setInfix("15/4");
+	a.setInfix("5/4");
 	a.GoToPostfix();
-	EXPECT_EQ(3.75, a.GoToCalculate());
+	EXPECT_EQ(1.25, a.GoToCalculate());
 }
 
 TEST(Translator, can_use_brackets)
@@ -247,16 +247,22 @@ TEST(Translator, cant_introduce_wrong_string_exp_3)
 TEST(Translator, cant_introduce_wrong_string_exp_4)
 {
 	Translator a;
-	a.setInfix("2..2+2");
+	a.setInfix("5..02+2");
 	//std::cout << a.getInfix() << std::endl;
+	//a.GoToPostfix();
+	//std::cout << a.getPostfix() << std::endl;
+	//std::cout << a.GoToCalculate() << std::endl;
 	EXPECT_EQ(false, a.GoToPostfix());
 }
 
 TEST(Translator, cant_introduce_wrong_string_exp_5)
 {
 	Translator a;
-	a.setInfix("2.2.+2");
+	a.setInfix("2.2.45+2");
 	//std::cout << a.getInfix() << std::endl;
+	//a.GoToPostfix();
+	//std::cout << a.getPostfix() << std::endl;
+	//std::cout << a.GoToCalculate() << std::endl;
 	EXPECT_EQ(false, a.GoToPostfix());
 }
 
@@ -268,11 +274,14 @@ TEST(Translator, cant_introduce_wrong_string_exp_6)
 	EXPECT_EQ(false, a.GoToPostfix());
 }
 
-TEST(Translator, cant_introduce_wrong_string_exp_7)
+TEST(Translator, cant_introduce_wrong_string_exp_7)//
 {
 	Translator a;
-	a.setInfix("2..+12");
+	a.setInfix("7..+12");
 	//std::cout << a.getInfix() << std::endl;
+	//a.GoToPostfix();
+	//std::cout << a.getPostfix() << std::endl;
+	//std::cout << a.GoToCalculate() << std::endl;
 	EXPECT_EQ(false, a.GoToPostfix());
 }
 
@@ -289,18 +298,24 @@ TEST(Translator, cant_introduce_wrong_string_exp_9)
 	Translator a;
 	a.setInfix(".2-0.1");
 	//std::cout << a.getInfix() << std::endl;
+	//a.GoToPostfix();
+	//std::cout << a.getPostfix() << std::endl;
+	//std::cout << a.GoToCalculate() << std::endl;
 	EXPECT_EQ(false, a.GoToPostfix());
 }
 
-TEST(Translator, cant_introduce_wrong_string_exp_10)
+TEST(Translator, can_introduce_well_string_exp1)
 {
 	Translator a;
-	a.setInfix("4.2+1.*");
+	a.setInfix("4.2+1.");
 	//std::cout << a.getInfix() << std::endl;
-	EXPECT_EQ(false, a.GoToPostfix());
+	//a.GoToPostfix();
+	//std::cout << a.getPostfix() << std::endl;
+	//std::cout << a.GoToCalculate() << std::endl;
+	EXPECT_EQ(true, a.GoToPostfix());
 }
 
-TEST(Translator, can_introduce_well_string)
+TEST(Translator, can_introduce_well_string_exp2)
 {
 	Translator a;
 	a.setInfix("2.2+2-2+1");
@@ -311,10 +326,31 @@ TEST(Translator, can_calculate_dificult_example)
 {
 	Translator a;
 	a.setInfix("2.2*2.94+1*(7/8)");
-	std::cout << a.getInfix() << std::endl;
+	//std::cout << a.getInfix() << std::endl;
 	a.GoToPostfix();
-	std::cout<< a.getPostfix() << std::endl;
-	std::cout << a.GoToCalculate() << std::endl;
+	//std::cout << a.getPostfix() << std::endl;
+	//std::cout << a.GoToCalculate() << std::endl;
 	EXPECT_EQ(7.343, a.GoToCalculate());
 }
 
+TEST(Translator, cant_div_on_zero)
+{
+	Translator a;
+	a.setInfix("7/0");
+	//std::cout << a.getInfix() << std::endl;
+	a.GoToPostfix();
+	//std::cout << a.getPostfix() << std::endl;
+	//std::cout << a.GoToCalculate() << std::endl;
+	EXPECT_EQ(-404, a.GoToCalculate());
+}
+
+TEST(Translator, cant_introduce_string_started_in_minus)
+{
+	Translator a;
+	a.setInfix("-2+4");
+	//std::cout << a.getInfix() << std::endl;
+	//a.GoToPostfix();
+	//std::cout << a.getPostfix() << std::endl;
+	//std::cout << a.GoToCalculate() << std::endl;
+	EXPECT_EQ(false, a.GoToPostfix());
+}
